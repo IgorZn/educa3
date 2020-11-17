@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+
 # Create your models here.
 
 
@@ -36,3 +39,14 @@ class Module(models.Model):
 
 	def __str__(self):
 		return self.title
+
+
+class Content(models.Model):
+	"""
+	Content model that represents the
+	modules' contents, and define a generic relation to associate any kind of content
+	"""
+	module = models.ForeignKey(Module, related_name='contents', on_delete=models.CASCADE)
+	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+	object_id = models.PositiveIntegerField()
+	item = GenericForeignKey('content_type', 'object_id')
