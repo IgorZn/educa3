@@ -4,6 +4,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Course
 
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
 # Create your views here.
 
 """
@@ -13,6 +15,17 @@ created by the current user. To prevent users from editing, updating, or deletin
 courses they didn't create, you will also need to override the get_queryset()
 method in the create, update, and delete views. When you need to provide a specific
 behavior for several class-based views, it is recommended that you use mixins.
+"""
+
+"""
+following two mixins provided by django.contrib.auth to limit access to views:
+	
+	• 	LoginRequiredMixin: Replicates the login_required decorator's
+		functionality.
+	
+	• 	PermissionRequiredMixin: Grants access to the view to users with
+		a specific permission. Remember that superusers automatically have
+		all permissions.
 """
 
 
@@ -49,7 +62,7 @@ class OwnerEditMixin(object):
 		return super().form_valid(form)
 
 
-class OwnerCourseMixin(OwnerMixin):
+class OwnerCourseMixin(OwnerMixin, LoginRequiredMixin, PermissionRequiredMixin):
 	model = Course
 	fields = ['subject', 'title', 'slug', 'overview']
 	success_url = reverse_lazy('manage_course_list')
@@ -66,6 +79,7 @@ class ManageCourseListView(OwnerCourseMixin, ListView):
 	attribute for a template to list courses.
 	"""
 	template_name = 'courses/manage/course/list.html'
+	permission_required = 'courses.view_course'
 
 
 class CourseCreateView(OwnerCourseEditMixin, CreateView):
@@ -75,7 +89,7 @@ class CourseCreateView(OwnerCourseEditMixin, CreateView):
 	form and also subclasses CreateView. It uses the template defined
 	in OwnerCourseEditMixin.
 	"""
-	pass
+	permission_required = 'courses.add_course'
 
 
 class CourseUpdateView(OwnerCourseEditMixin, UpdateView):
@@ -85,7 +99,7 @@ class CourseUpdateView(OwnerCourseEditMixin, UpdateView):
 	form and also subclasses UpdateView. It uses the template defined
 	in OwnerCourseEditMixin.
 	"""
-	pass
+	permission_required = 'courses.change_course'
 
 
 class CourseDeleteView(OwnerCourseMixin, DeleteView):
@@ -96,3 +110,4 @@ class CourseDeleteView(OwnerCourseMixin, DeleteView):
 	in OwnerCourseEditMixin.
 	"""
 	template_name = 'courses/manage/course/delete.html'
+	permission_required = 'courses.delete_course'
