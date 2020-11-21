@@ -27,6 +27,7 @@ class Course(models.Model):
 	slug = models.SlugField(max_length=200, unique=True)
 	overview = models.TextField()
 	created = models.DateTimeField(auto_now_add=True)
+
 	class Meta:
 		ordering = ['-created']
 
@@ -50,8 +51,8 @@ class Module(models.Model):
 
 class Content(models.Model):
 	"""
-	Content model that represents the
-	modules' contents, and define a generic relation to associate any kind of content
+	Content model that represents the modules' contents, and define a generic relation
+	to associate any kind of content
 
 	Remember that you need three different fields to set up a generic relation. In your
 	Content model, these are:
@@ -60,11 +61,12 @@ class Content(models.Model):
 		• item: A GenericForeignKey field to the related object combining the two previous fields
 	"""
 	module = models.ForeignKey(Module, related_name='contents', on_delete=models.CASCADE)
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in':(
-																											'text',
-																											'video',
-																											'image',
-																											'file')})
+	content_type = models.ForeignKey(
+		ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': (
+																				'text',
+																				'video',
+																				'image',
+																				'file')})
 	object_id = models.PositiveIntegerField()
 	item = GenericForeignKey('content_type', 'object_id')
 
