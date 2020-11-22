@@ -63,3 +63,61 @@
         </div>
     {% endwith %}
 {% endblock %}
+{% block domready %}
+    <!--
+    In this code, you perform the following tasks:
+
+        1. You define a sortable element for the modules HTML element. Remember
+        that you use #modules, since jQuery uses CSS notation for selectors.
+
+        2. You specify a function for the stop event. This event is triggered every time
+        the user finishes sorting an element.
+
+        3. You create an empty modules_order dictionary. The keys for this dictionary
+        will be the module IDs, and the values will be the assigned order for each
+        module.
+
+        4. You iterate over the #module children elements. You recalculate the
+        displayed order for each module and get its data-id attribute, which
+        contains the module's ID. You add the ID as the key of the modules_order
+        dictionary and the new index of the module as the value.
+
+        5. You launch an AJAX POST request to the content_order URL, including the
+        serialized JSON data of modules_order in the request. The corresponding
+        ModuleOrderView takes care of updating the order of the modules. -->
+
+    $('#modules').sortable({
+        stop: function(event, ui) {
+            modules_order = {};
+            $('#modules').children().each(function(){
+                // update the order field
+                $(this).find('.order').text($(this).index() + 1);
+                // associate the module's id with its order
+                modules_order[$(this).data('id')] = $(this).index();
+            });
+            $.ajax({
+                    type: 'POST',
+                    url: '{% url "module_order" %}',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    data: JSON.stringify(modules_order)
+                });
+            }
+    });
+            $('#module-contents').sortable({
+                stop: function(event, ui) {
+                    contents_order = {};
+                $('#module-contents').children().each(function(){
+                    // associate the module's id with its order
+                    contents_order[$(this).data('id')] = $(this).index();
+            });
+            $.ajax({
+                    type: 'POST',
+                    url: '{% url "content_order" %}',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    data: JSON.stringify(contents_order),
+                });
+            }
+    });
+{% endblock %}
