@@ -6,6 +6,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .fields import OrderField
 
+from django.template.loader import render_to_string
+
 # Create your models here.
 
 
@@ -89,6 +91,11 @@ class ItemBase(models.Model):
 	title = models.CharField(max_length=250)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	def render(self):
+		"""This method uses the render_to_string() function for rendering a template and
+		returning the rendered content as a string."""
+		return render_to_string(f'courses/content/{self._meta.model_name}.html', {'item': self})
 
 	class Meta:
 		abstract = True

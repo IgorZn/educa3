@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 django = "*"
 django-braces = "*"
+django-embed-video = "*"
 
 [requires]
 python_version = "3.7"
